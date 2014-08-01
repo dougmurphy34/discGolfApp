@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+    <widget xmlns   = "http://www.w3.org/ns/widgets"
+        xmlns:gap   = "http://phonegap.com/ns/1.0"
+        id          = "com.floodbat.morleyfieldscoringapp"
+        versionCode = "12" 
+        version     = "0.0.9" >
+
+    <!-- versionCode is optional and Android only -->
+
+    <name>Morley Field Scoring App</name>
+
+    <description>
+        Keep score when you play disc golf at Morley Field.
+    </description>
+
+    <author href="https://www.floodbat.com">
+        Doug Murphy, Floodbat Creative
+    </author>
+	
+	<preference name="fullscreen" value="true" />
+	
+	
+	<icon src="icon.png" />
+
+</widget>
