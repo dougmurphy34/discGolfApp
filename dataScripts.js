@@ -14,21 +14,24 @@ Get PB by looping on players until username=(thisuser) is found, then loop on sc
 */
 
 /*TODO future functionality
-	1) Display app version onscreen. - see http://think2loud.com/224-reading-xml-with-jquery/
-	5) on create player, redraw player select list
+	1) SKIP - Display app version onscreen. - see http://think2loud.com/224-reading-xml-with-jquery/
+	2) Put a data summary screen that shows all players, their games played, PBs and averages
 	3) delete players from memory
-	9) fix endgame not working on Android, works on iOS
+	4) Record full detail of rounds, changing data type to remember score on each hole.
+	5) Force reorient on long scorecard; switch back on return.
+	6) "Done" button for player select.
+	7) Roll my own theme here: http://themeroller.jquerymobile.com/
+*/
+
+/*
+TODO: Minor bug fixes
+    1) fix endgame not working on Android, works on iOS
 		--shows the wrong score on iOS (was 0/+1, showed 0/0) (0.0.7, live 19 holes); One test today (0.0.8) seemed to work on iPhone
 		-- Android FIX FAILED with window.location.hash.
-	4) Names with spaces don't calculate a score
-	2) Change orientation of screen on scorecard (and change back)
-	3) For iOS, turn off iPhone's top bar (with clock, battery, wifi, etc)
-	8) Create an info.plist file, so app can be accepted by Apple App Store.
-		--https://developer.apple.com/library/ios/documentation/General/Reference/InfoPlistKeyReference/Introduction/Introduction.html#//apple_ref/doc/uid/TP40009247
-	7) Put a data summary screen that shows all players, their games played, PBs and averages
-	6) Record full detail of rounds, changing data type to remember score on each hole.
-		
-*/
+	2) Names with spaces don't calculate a score
+	3) on create player, redraw player select list
+ */
+
 $(document).ready(function() {
 	
 	//no idea why I can't get these with jquery selectors
@@ -38,9 +41,13 @@ $(document).ready(function() {
 	document.getElementById("fullScorecardButton").addEventListener("click", populateLongCard, false);
 	document.getElementById("endgameResetButton").addEventListener("click", startNewGame, false);
 	document.getElementById("midgameResetButton").addEventListener("click", startNewGame, false);
-	
+
+    var current_version = getCurrVersion();
+
+    $("#versionNumber").text(current_version);
+
 	newGameFlag = 0;
-	/**/
+
 	if (localStorage.getItem('currentGame') == "") {//Is this catching both null (never been set) and [] (I cleared it)?
 		//alert('There is NO game data');
 		newGameFlag = 1;
@@ -102,6 +109,20 @@ function beenClicked() {//This is when the "enter scores" button is clicked.  Wo
 	}
 }
 
+function getCurrVersion() {
+    $.ajax({
+        type: "GET",
+	    url: "config.xml",
+	    dataType: "xml",
+	    success: function(xml) {
+            var version = $(xml).find('widget').attr('version');
+            return version
+	    }
+        });
+
+    return ""
+}
+
 function userCreate() {
 	var newName = document.getElementById("nameText").value;
 	var fail = false;
@@ -148,10 +169,10 @@ function startNewGame() {
 		localStorage.setItem("currentHole", 1);
 		
 		//then, dump current score data from localStorage
-		localStorage.setItem("currentGame", [])
+		localStorage.setItem("currentGame", []);
 		
 		//then dump it from local variable
-		currentPlayers = []
+		currentPlayers = [];
 		
 		//then navigate to home
 		window.location = "index.html"
@@ -159,12 +180,12 @@ function startNewGame() {
 }
 
 function setUpScorecard() {
+    var x;
 	if (newGameFlag == 1) {//get players from the ones chosen in the player selector
 		//alert("in newgameflag=1")
-		var x = $("#playerselector option:selected").map(function(){ return this.value }).get();
+		x = $("#playerselector option:selected").map(function(){ return this.value }).get();
 	}
 	else {//not a new game, grab players from currentPlayers data (pulled from localStorage)
-		var x;
 		var usernameArray = [];
 		currentPlayers.forEach(function(player) {
 				usernameArray.push(player["Username"]);
@@ -262,8 +283,7 @@ function setUpScorecard() {
 		thisFieldset.appendChild(thisInput6);
 		
 		//format all fieldsets via jquery
-		$('fieldset').attr('data-role', 'controlgroup');
-		$('fieldset').attr('data-type', 'horizontal');
+		$('fieldset').attr('data-role', 'controlgroup').attr('data-type', 'horizontal');
 	});
 	
 	//set all initial scores to zero for new game, or actual for reloaded game
@@ -360,7 +380,7 @@ function resetScoreEntry() {
 		tempElementId = currUser.Username + "Par";
 		document.getElementById(tempElementId).checked = true;
 		}
-	)
+	);
 	
 	$("input[type='radio']").checkboxradio("refresh");
 	
@@ -377,7 +397,7 @@ function updateScores() {
 		
 		currentPlayers[i].Scores.forEach(function(oneHoleScore) {
 			tempTotal += oneHoleScore;
-		})
+		});
 			
 		
 		if (tempTotal > 0) {
@@ -412,18 +432,18 @@ function endgame() {
 		var total = 0;
 		currUser.Scores.forEach(function(currScore){
 			total += currScore;
-		})
+		});
 		
 		if (total < bestScore)	{
 			bestScore = total
 			}
-	})
+	});
 	
 	currentPlayers.forEach(function(currUser) {
 		var total = 0;
 		currUser.Scores.forEach(function(currScore){
 			total += currScore;
-		})
+		});
 	
 		if (total == bestScore) {
 			$("#winnertext").append("<b>" + currUser.Username + " wins! ........... " + total + "</b><br>")

@@ -3,7 +3,7 @@
         xmlns:gap   = "http://phonegap.com/ns/1.0"
         id          = "com.floodbat.morleyfieldscoringapp"
         versionCode = "12" 
-        version     = "0.0.9" >
+        version     = "0.0.10" >
 
     <!-- versionCode is optional and Android only -->
 
@@ -21,5 +21,10 @@
 	
 	
 	<icon src="icon.png" />
+
+    <!-- This trick should get rid of the ios status bar, using phonegap's interface to edit the info.plist -->
+	<gap:config-file platform="ios" parent="UIViewControllerBasedStatusBarAppearance" overwrite="true">
+    <false/>
+	</gap:config-file>
 
 </widget>
